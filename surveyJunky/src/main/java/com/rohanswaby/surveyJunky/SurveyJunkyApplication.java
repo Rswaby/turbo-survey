@@ -21,4 +21,5 @@ public class SurveyJunkyApplication {
 		SpringApplication.run(SurveyJunkyApplication.class, args);
 	}
 
+
 }
