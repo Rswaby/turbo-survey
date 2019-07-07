@@ -3,6 +3,7 @@ package com.rohanswaby.surveyJunky.services;
 import com.rohanswaby.surveyJunky.Payload.PagedResponse;
 import com.rohanswaby.surveyJunky.Payload.SurveyRequest;
 import com.rohanswaby.surveyJunky.Payload.SurveyResponse;
+import com.rohanswaby.surveyJunky.Payload.VoteRequest;
 import com.rohanswaby.surveyJunky.exception.BadRequestException;
 import com.rohanswaby.surveyJunky.exception.ResourceNotFoundException;
 import com.rohanswaby.surveyJunky.models.*;
@@ -12,10 +13,10 @@ import com.rohanswaby.surveyJunky.repository.VoteRepository;
 import com.rohanswaby.surveyJunky.security.UserPrincipal;
 import com.rohanswaby.surveyJunky.utils.Constants;
 import com.rohanswaby.surveyJunky.utils.ModelMapper;
-import org.apache.tomcat.jni.Poll;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -183,47 +184,47 @@ public class SurveyService {
                 creator, userVote != null ? userVote.getChoice().getId(): null);
     }
 
-//    public SurveyResponse castVoteAndGetUpdatedSurvey(Long surveyId, VoteRequest voteRequest, UserPrincipal currentUser) {
-//        Poll poll = pollRepository.findById(pollId)
-//                .orElseThrow(() -> new ResourceNotFoundException("Poll", "id", pollId));
-//
-//        if(poll.getExpirationDateTime().isBefore(Instant.now())) {
-//            throw new BadRequestException("Sorry! This Poll has already expired");
-//        }
-//
-//        User user = userRepository.getOne(currentUser.getId());
-//
-//        Choice selectedChoice = poll.getChoices().stream()
-//                .filter(choice -> choice.getId().equals(voteRequest.getChoiceId()))
-//                .findFirst()
-//                .orElseThrow(() -> new ResourceNotFoundException("Choice", "id", voteRequest.getChoiceId()));
-//
-//        Vote vote = new Vote();
-//        vote.setPoll(poll);
-//        vote.setUser(user);
-//        vote.setChoice(selectedChoice);
-//
-//        try {
-//            vote = voteRepository.save(vote);
-//        } catch (DataIntegrityViolationException ex) {
-//            logger.info("User {} has already voted in Poll {}", currentUser.getId(), pollId);
-//            throw new BadRequestException("Sorry! You have already cast your vote in this poll");
-//        }
-//
-//        //-- Vote Saved, Return the updated Poll Response now --
-//
-//        // Retrieve Vote Counts of every choice belonging to the current poll
-//        List<ChoiceVoteCount> votes = voteRepository.countByPollIdGroupByChoiceId(pollId);
-//
-//        Map<Long, Long> choiceVotesMap = votes.stream()
-//                .collect(Collectors.toMap(ChoiceVoteCount::getChoiceId, ChoiceVoteCount::getVoteCount));
-//
-//        // Retrieve poll creator details
-//        User creator = userRepository.findById(poll.getCreatedBy())
-//                .orElseThrow(() -> new ResourceNotFoundException("User", "id", poll.getCreatedBy()));
-//
-//        return ModelMapper.mapPollToPollResponse(poll, choiceVotesMap, creator, vote.getChoice().getId());
-//    }
+    public SurveyResponse castVoteAndGetUpdatedSurvey(Long surveyId, VoteRequest voteRequest, UserPrincipal currentUser) {
+        Survey survey = surveyRepository.findById(surveyId)
+                .orElseThrow(() -> new ResourceNotFoundException("survey", "id", surveyId));
+
+        if(survey.getExpirationDateTime().isBefore(Instant.now())) {
+            throw new BadRequestException("Sorry! This survey has already expired");
+        }
+
+        User user = userRepository.getOne(currentUser.getId());
+
+        Choice selectedChoice = survey.getChoices().stream()
+                .filter(choice -> choice.getId().equals(voteRequest.getChoiceId()))
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Choice", "id", voteRequest.getChoiceId()));
+
+        Vote vote = new Vote();
+        vote.setSurvey(survey);
+        vote.setUser(user);
+        vote.setChoice(selectedChoice);
+
+        try {
+            vote = voteRepository.save(vote);
+        } catch (DataIntegrityViolationException ex) {
+            logger.info("User {} has already voted in Poll {}", currentUser.getId(), surveyId);
+            throw new BadRequestException("Sorry! You have already cast your vote in this poll");
+        }
+
+        //-- Vote Saved, Return the updated Poll Response now --
+
+        // Retrieve Vote Counts of every choice belonging to the current poll
+        List<ChoiceVoteCount> votes = voteRepository.countBySurveyIdGroupByChoiceId(surveyId);
+
+        Map<Long, Long> choiceVotesMap = votes.stream()
+                .collect(Collectors.toMap(ChoiceVoteCount::getChoiceId, ChoiceVoteCount::getVoteCount));
+
+        // Retrieve poll creator details
+        User creator = userRepository.findById(survey.getCreatedBy())
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", survey.getCreatedBy()));
+
+        return ModelMapper.mapSurveyToSurveyResponse(survey, choiceVotesMap, creator, vote.getChoice().getId());
+    }
 
 
     private void validatePageNumberAndSize(int page, int size) {
@@ -271,4 +272,6 @@ public class SurveyService {
 
         return creatorMap;
     }
+
+
 }

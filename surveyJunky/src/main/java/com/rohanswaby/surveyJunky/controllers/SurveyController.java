@@ -1,9 +1,6 @@
 package com.rohanswaby.surveyJunky.controllers;
 
-import com.rohanswaby.surveyJunky.Payload.ApiResponse;
-import com.rohanswaby.surveyJunky.Payload.PagedResponse;
-import com.rohanswaby.surveyJunky.Payload.SurveyRequest;
-import com.rohanswaby.surveyJunky.Payload.SurveyResponse;
+import com.rohanswaby.surveyJunky.Payload.*;
 import com.rohanswaby.surveyJunky.models.Survey;
 import com.rohanswaby.surveyJunky.repository.SurveyRepository;
 import com.rohanswaby.surveyJunky.repository.UserRepository;
@@ -68,7 +65,8 @@ public class SurveyController {
     @GetMapping("/{surveyId}")
     public SurveyResponse getSurveyById(@CurrentUser UserPrincipal currentUser,
                                     @PathVariable Long surveyId) {
-        return SurveyService.getSurveyById(surveyId, currentUser);
+        SurveyResponse surveyById = surveyService.getSurveyById(surveyId, currentUser);
+        return surveyById;
     }
 
     @PostMapping("/{surveyId}/votes")

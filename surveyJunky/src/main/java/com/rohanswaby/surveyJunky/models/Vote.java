@@ -38,7 +38,7 @@ public class Vote extends DateAudit {
         return this.survey;
     }
 
-    public void setPoll(Survey survey) {
+    public void setSurvey(Survey survey) {
         this.survey = survey;
     }
 

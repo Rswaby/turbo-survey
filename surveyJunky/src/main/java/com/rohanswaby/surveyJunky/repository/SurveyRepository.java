@@ -11,16 +11,16 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class SurveyRepository extends JpaRepository<Survey,Long> {
+public abstract class SurveyRepository implements JpaRepository<Survey, Long> {
 
-    public Optional<Survey> findById(Long surveyId);
+    public abstract Optional<Survey> findById(Long surveyId);
 
-    public Page<Survey> findByCreatedBy(Long userId, Pageable pageable);
+    public abstract Page<Survey> findByCreatedBy(Long userId, Pageable pageable);
 
-    public long countByCreatedBy(Long userId);
+    public abstract long countByCreatedBy(Long userId);
 
-    public List<Survey> findByIdIn(List<Long> surveyIds);
+    public abstract List<Survey> findByIdIn(List<Long> surveyIds);
 
-    public List<Survey> findByIdIn(List<Long> surveyIds, Sort sort);
+    public abstract List<Survey> findByIdIn(List<Long> surveyIds, Sort sort);
 
 }
