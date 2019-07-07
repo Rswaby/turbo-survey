@@ -73,4 +73,9 @@ public class Choice {
     }
 
 
+    public void add(Choice choice) {
+    }
+
+    public void remove(Choice choice) {
+    }
 }

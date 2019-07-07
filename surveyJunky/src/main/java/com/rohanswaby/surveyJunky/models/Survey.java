@@ -13,6 +13,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "surveys")
 public class Survey extends UserDateAudit {
 
     @Id
@@ -79,7 +81,7 @@ public class Survey extends UserDateAudit {
     }
 
 
-    public void removeChoice(choice choice){
+    public void removeChoice(Choice choice){
         choice.remove(choice);
         choice.setSurvey(null);
     }

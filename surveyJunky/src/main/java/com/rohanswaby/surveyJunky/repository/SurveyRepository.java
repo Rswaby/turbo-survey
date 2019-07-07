@@ -13,14 +13,14 @@ import java.util.Optional;
 @Repository
 public class SurveyRepository extends JpaRepository<Survey,Long> {
 
-    Optional<Survey> findById(Long surveyId);
+    public Optional<Survey> findById(Long surveyId);
 
-    Page<Survey> findByCreatedBy(Long userId, Pageable pageable);
+    public Page<Survey> findByCreatedBy(Long userId, Pageable pageable);
 
-    long countByCreatedBy(Long userId);
+    public long countByCreatedBy(Long userId);
 
-    List<Survey> findByIdIn(List<Long> surveyIds);
+    public List<Survey> findByIdIn(List<Long> surveyIds);
 
-    List<Survey> findByIdIn(List<Long> surveyIds, Sort sort);
+    public List<Survey> findByIdIn(List<Long> surveyIds, Sort sort);
 
 }
